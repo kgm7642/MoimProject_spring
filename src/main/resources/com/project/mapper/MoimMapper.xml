@@ -1,0 +1,465 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.MoimMapper">
+
+	<!-- =============================================== 장소 생성(createPlace.jsp) =============================================== -->
+		
+	<!-- 장소 생성 -->
+	<insert id="insertPlace">
+		<selectKey keyProperty="placenum" order="BEFORE" resultType="_int">
+			SELECT SEQ_S_PLACE.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO S_PLACE
+		(PLACENUM, PLACELAT, PLACELNG, PLACENAME, PLACEADDR, PLACEROADADDR)
+		VALUES(#{placenum}, #{placelat}, #{placelng}, #{placename}, #{placeaddr}, #{placeroadaddr})
+	</insert>
+	
+	<!-- =============================================== 모임  생성(createMoim.jsp) =============================================== -->
+	
+	<!-- 모임 생성 -->
+	<insert id="insertMoim">	
+		<selectKey keyProperty="moimnum" order="BEFORE" resultType="_int">
+			SELECT SEQ_S_MOIM.NEXTVAL FROM DUAL
+		</selectKey>	
+		INSERT INTO S_MOIM
+		(MOIMNUM, MOIMNAME, MOIMTYPE, MOIMBUDGET, STARTDATE, ENDDATE, USERID, PLACENUM, DISLIKE)
+		VALUES(#{moimnum}, #{moimname}, #{moimtype}, #{moimbudget}, TO_DATE(#{startdate},'YYYY-MM-DD'), 
+		TO_DATE(#{enddate},'YYYY-MM-DD'), #{userid}, #{placenum}, 0)
+	</insert>
+	
+	<!-- =============================================== 멤버 추가(createMoim.jsp) =============================================== -->
+	
+	<!-- 멤버 추가 -->
+	<insert id="insertMember">
+		INSERT INTO WEB.S_MOIMMEMBER
+		(MEMBERNUM, USERID, MOIMNUM)
+		VALUES(SEQ_S_M_MEMBER.NEXTVAL, #{userid}, #{moimnum})
+	</insert>
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 모임 리스트(moimList.jsp) =============================================== -->
+	<sql id="cri">
+		<if test="keyword != null and type != null">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach item="type" collection="typeArr">
+					<trim prefix="or">
+						<choose>
+							<when test="type == 'T'.toString()">
+								MOIMNAME LIKE '%${keyword}%'
+							</when>
+							<when test="type == 'W'.toString()">
+								USERID LIKE '%${keyword}%'
+							</when>
+						</choose>
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>	
+	
+	<!-- 전체 모임 수-->
+	<select id="moimTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_MOIM	WHERE
+		<include refid="cri"/>
+		MOIMNUM > 0
+	</select>
+	
+	<!-- 모임 리스트 -->
+	<select id="moimList" resultType="com.project.domain.MoimDTO">
+		<![CDATA[
+			SELECT MOIMNUM, MOIMNAME, MOIMTYPE, MOIMBUDGET, STARTDATE, ENDDATE, USERID, PLACENUM, DISLIKE
+			FROM 
+				(SELECT /*+ INDEX_DESC(S_MOIM SYS_C008948) */
+				ROWNUM RN, MOIMNUM, MOIMNAME, MOIMTYPE, MOIMBUDGET, STARTDATE, ENDDATE, USERID, PLACENUM, DISLIKE
+				FROM S_MOIM WHERE 
+		]]>
+		<include refid="cri"/>
+		<![CDATA[
+			ROWNUM <= #{pagenum}*#{amount} ORDER BY MOIMNUM DESC)
+			WHERE RN > (#{pagenum}-1)*#{amount}
+		]]>
+	</select>
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 모임 상세 보기(getMoimInfo.jsp) =============================================== -->	
+	
+	<!-- 모임 멤버 -->
+	<select id="getMemberId" resultType="String">
+		SELECT USERID FROM S_MOIMMEMBER WHERE MOIMNUM=#{moimnum}
+	</select>
+	
+	<!-- 모임 멤버 정보 -->
+	<select id="getMemberInfo" resultType="com.project.domain.UserDTO">
+		SELECT * FROM S_USER WHERE USERID=#{userid}
+	</select>
+	
+	<!-- 모임 상세 정보 -->
+	<select id="getMoimDetail" resultType="com.project.domain.MoimDTO">
+		SELECT * FROM S_MOIM WHERE MOIMNUM = #{moimnum}
+	</select>
+	
+	<!-- 모임 장소 정보  -->
+	<select id="getPlaceDetail" resultType="com.project.domain.PlaceDTO">
+		SELECT * FROM S_PLACE WHERE PLACENUM=#{placenum}
+	</select>
+
+	<!-- 이미 모임 회원인지 확인 -->
+	<select id="checkAlreadyJoin" resultType="_int">
+		SELECT COUNT(*) FROM S_MOIMMEMBER WHERE USERID=#{userid} AND MOIMNUM=#{moimnum}
+	</select>
+
+	<!-- 모임 탈퇴 -->
+ 	<delete id="outMoim">
+ 		DELETE FROM S_MOIMMEMBER WHERE MOIMNUM=#{moimnum} AND USERID=#{userid}
+ 	</delete>	
+ 		
+ 	<!-- 모임 싫어요 1 증가 -->
+ 	<update id="updateDislikeMoimnum">
+ 		UPDATE WEB.S_MOIM
+		SET DISLIKE=DISLIKE+1
+		WHERE MOIMNUM = #{moimnum}
+ 	</update>
+ 		
+	<!-- 모임 싫어요 검색 -->
+ 	<select id="getDislikeMoim" resultType="_int">
+ 		SELECT DISLIKE FROM S_MOIM WHERE MOIMNUM = #{moimnum}
+ 	</select> 	
+
+ 	<!-- 모임 채팅 삭제 -->
+ 	<delete id="deleteChat">
+			DELETE FROM S_MOIMCHAT WHERE MOIMNUM=#{moimnum}
+	</delete>	
+ 	
+ 	<!-- 모임 멤버 삭제 -->
+ 	<delete id="deleteMembers">
+		DELETE FROM S_MOIMMEMBER WHERE MOIMNUM=#{moimnum}
+	</delete>	
+ 	
+ 	<!-- 모임 강퇴 메세지 삭제 -->
+ 	<delete id="deleteFireMoim">
+		DELETE FROM S_FIREMOIM WHERE MOIMNUM=#{moimnum}
+	</delete>
+	
+	<!-- 모임 가입 신청 삭제 -->
+	<delete id = "deleteMoimJoin">
+		DELETE FROM S_MOIMJOIN
+		WHERE MOIMNUM = #{moimnum}
+	</delete>	
+
+	<!-- 홍보 게시글 모두 검색 -->
+	<select id="getRecruitnums" resultType="Integer">
+		SELECT RECRUITNUM FROM S_MOIMRECRUIT
+		WHERE MOIMNUM=#{moimnum}
+	</select> 	
+ 	
+ 	<!-- 홍보 게시글 삭제 -->
+	<delete id="deleteRecruit">
+		DELETE FROM S_MOIMRECRUIT
+		WHERE MOIMNUM = #{moimnum}
+	</delete> 	
+	
+	<!-- 홍보 게시글 댓글 삭제 -->
+ 	<delete id="deleteProReply">
+		DELETE FROM S_RECRUITREPLY
+		WHERE RECRUITNUM = #{recruitnum}
+	</delete>	
+ 	
+ 	<!-- 장소 번호 검색 -->
+	<select id="getPlaceNum" resultType="_int">
+		SELECT PLACENUM FROM S_MOIM WHERE MOIMNUM = #{moimnum}
+	</select> 	
+ 	
+ 	<!-- 모임 삭제 -->
+	<delete id="deleteMoim">
+		DELETE FROM S_MOIM WHERE MOIMNUM=#{moimnum}
+	</delete>
+
+	<!-- 장소 삭제 -->
+	<delete id="deletePlace">
+ 		DELETE FROM S_PLACE WHERE PLACENUM=#{placenum}
+ 	</delete>	
+	<!-- ======================================================================================================== -->
+
+	<!-- =============================================== 모임 채팅(moimChat.jsp) =============================================== -->	
+	
+    <!-- 채팅 리스트를 가져온다. -->
+	<select id="getChatList" resultType="com.project.domain.MoimChatDTO">
+		SELECT * FROM S_MOIMCHAT WHERE MOIMNUM=#{moimnum} ORDER BY MOIMCHATNUM
+	</select>
+
+   	<!-- 채팅 입력 -->
+   	<insert id="insertMoimChat">
+   		INSERT INTO WEB.S_MOIMCHAT
+		(MOIMCHATNUM, USERID, MOIMNUM, MOIMCHATCONTENTS, MOIMCHATDATE)
+		VALUES(SEQ_S_MOIMCHAT.NEXTVAL, #{userid}, #{moimnum}, #{moimchatcontents}, SYSDATE)
+   	</insert>
+   	
+   	<!-- 가장 최근 채팅을 가져온다. -->
+   	<select id="getChatLast" resultType="com.project.domain.MoimChatDTO">
+   		SELECT * FROM
+			(
+				SELECT * FROM S_MOIMCHAT WHERE MOIMNUM = #{moimnum} ORDER BY MOIMCHATDATE DESC
+			)
+		WHERE ROWNUM = 1
+   	</select>
+
+	<!-- ======================================================================================================== -->
+
+	<!-- =============================================== 모임 신청 관리(applyMoimInfo.jsp) =============================================== -->	
+	
+	<!-- 모임 신청 리스트 -->
+	<select id="getMoimJoinList" resultType="com.project.domain.MoimJoinDTO">
+		SELECT * FROM S_MOIMJOIN WHERE MOIMNUM = #{moimnum} ORDER BY MOIMNUM ASC
+	</select>	
+	
+	<!-- 모임 신청서 정보 -->
+	<select id="getMoimJoin" resultType="com.project.domain.MoimJoinDTO">
+		SELECT * FROM S_MOIMJOIN WHERE MOIMJOINNUM = #{moimjoinnum}
+	</select>
+	
+	<!-- 모임 신청 후 신청서 삭제 -->		
+	<delete id="removeJoinList">
+		DELETE FROM S_MOIMJOIN WHERE MOIMNUM=#{moimnum} and JOINUSERID=#{joinuserid}
+	</delete>
+	
+	<!-- =============================================== 모임 가입 신청(adMoimJoin.jsp) =============================================== -->	
+	
+	<!-- 모임 가입 신청서 작성 -->
+	<insert id="insertJoinMoim">
+		INSERT INTO WEB.S_MOIMJOIN
+		(MOIMJOINNUM, KINGUSERID, JOINUSERID, MOIMNUM, JOINCONTENTS, REGDATE)
+		VALUES(SEQ_S_MOIMJOIN.NEXTVAL, #{kinguserid}, #{joinuserid}, #{moimnum}, #{joincontents}, SYSDATE)
+	</insert>		
+	
+	<!-- ======================================================================================================== -->
+
+	<!-- =============================================== 모임 멤버 관리(manageMember.jsp) =============================================== -->	
+		
+	<!-- 강퇴 메세지 저장 -->
+	<insert id="fireMessage">
+		INSERT INTO S_FIREMOIM
+		VALUES(SEQ_S_FIREMOIM.NEXTVAL, #{userid}, #{moimnum}, #{message})
+	</insert>	
+	
+	<!-- 멤버 삭제 -->
+	<delete id="fireMember">
+		DELETE FROM S_MOIMMEMBER WHERE USERID=#{userid} AND MOIMNUM=#{moimnum}
+	</delete>	
+	
+	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 모임 수정(updateMoim.jsp, updatePlace.jsp) ========================================== -->	
+
+	<!-- 모임 정보 수정 -->
+ 	<update id="updateMoim">
+ 		UPDATE S_MOIM SET MOIMNAME= #{moimname}, MOIMTYPE = #{moimtype}, MOIMBUDGET = #{moimbudget},
+ 		STARTDATE= TO_DATE(#{startdate},'YYYY-MM-DD'), ENDDATE =TO_DATE(#{enddate},'YYYY-MM-DD')
+ 		WHERE MOIMNUM = #{moimnum}
+ 	</update>
+ 	
+ 	<!-- 모임 장소 수정 -->
+ 	<update id="updatePlace">
+		UPDATE S_PLACE SET PLACELAT= #{placelat}, PLACELNG = #{placelng}, PLACENAME = #{placename}, 
+		PLACEADDR = #{placeaddr}, PLACEROADADDR = #{placeroadaddr}
+		WHERE PLACENUM = #{placenum}
+	</update>	
+	
+	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 모임 홍보 게시판(proMoimList.jsp) ========================================== -->	
+	
+	<sql id="criPro">
+		<if test="keyword != null and type != null">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach item="type" collection="typeArr">
+					<trim prefix="or">
+						<choose>
+							<when test="type == 'T'.toString()">
+								(RECRUITTITLE LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'C'.toString()">
+								(RECRUITCONTENTS LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'W'.toString()">
+								(USERID LIKE '%${keyword}%')
+							</when>
+						</choose>					
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>	
+
+	<!-- 모임 홍보 리스트 -->
+	<select id="proMoimList" resultType="com.project.domain.MoimRecruitDTO">
+		<![CDATA[
+			SELECT RECRUITNUM, RECRUITTITLE, USERID, RECRUITCONTENTS, READCNT, MOIMNUM, REGDATE, DISLIKE
+			FROM
+				(SELECT /*+ INDEX_DESC(S_MOIMRECRUIT SYS_C008984) */
+				ROWNUM RN, RECRUITNUM, RECRUITTITLE, USERID, RECRUITCONTENTS, READCNT, MOIMNUM, REGDATE, DISLIKE 
+				FROM S_MOIMRECRUIT WHERE
+		]]>
+		<include refid="criPro"></include>	
+		<![CDATA[
+				ROWNUM<=#{pagenum}*#{amount} ORDER BY RECRUITNUM DESC)
+			WHERE RN>(#{pagenum}-1)*#{amount}
+		]]> 
+	</select>
+	
+	<!-- 전체 홍보 게시글 수 -->
+	<select id="ProMoimTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_MOIMRECRUIT WHERE
+		<include refid="criPro"></include>
+		RECRUITNUM>0
+	</select>	
+	
+	<!-- 모임장인지 체크 -->
+	<select id="checkKing" resultType="_int">
+		SELECT COUNT(*) FROM S_MOIM WHERE USERID=#{userid}
+	</select>	
+	
+	<!-- 모임장의 모든 모임 리스트 -->
+	<select id="getMyMoimList" resultType="com.project.domain.MoimDTO">
+		SELECT * FROM S_MOIM WHERE USERID=#{userid}
+	</select>	
+	
+	<!-- 홍보 게시글 작성 -->
+	<insert id="insertRecruit">
+		<selectKey keyProperty="recruitnum" order="BEFORE" resultType="_int">
+			SELECT SEQ_S_M_RECRUIT.NEXTVAL FROM DUAL
+		</selectKey>	
+		INSERT INTO WEB.S_MOIMRECRUIT
+		(RECRUITNUM, RECRUITTITLE, USERID, RECRUITCONTENTS, READCNT, MOIMNUM, REGDATE, DISLIKE)
+		VALUES(#{recruitnum}, #{recruittitle}, #{userid}, #{recruitcontents}, 0, #{moimnum}, SYSDATE, 0)
+	</insert>	
+	
+	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 모임 홍보 게시판 상세보기(proMoimView.jsp) ========================================== -->	
+		
+	<!-- 홍보 게시글 상세보기 -->
+	<select id="getRecruitDetail" resultType="com.project.domain.MoimRecruitDTO">
+		SELECT * FROM S_MOIMRECRUIT WHERE RECRUITNUM = #{recruitnum}
+	</select>
+	
+	<!-- 홍보 게시글 조회수 1증가 -->
+	<update id="updateReadCnt">
+		UPDATE S_MOIMRECRUIT SET READCNT = READCNT+1 WHERE RECRUITNUM=#{recruitnum}
+	</update>	
+	
+	<!-- 홍보 게시글 수정 -->
+	<update id="updateRecruit">
+		UPDATE WEB.S_MOIMRECRUIT
+		SET RECRUITTITLE=#{recruittitle}, RECRUITCONTENTS=#{recruitcontents}, REGDATE=SYSDATE
+		WHERE RECRUITNUM=#{recruitnum}
+	</update>
+	
+	<!-- 홍보 게시글 삭제 -->
+	<delete id="removeRecruit">
+		DELETE FROM S_MOIMRECRUIT WHERE RECRUITNUM=#{recruitnum}
+	</delete>
+	
+	<!-- 홍보 게시글 댓글 조회 -->
+	<select id="searchReply" resultType="_int">
+		SELECT COUNT(*)
+		FROM WEB.S_RECRUITREPLY WHERE RECRUITNUM=#{recruitnum}
+	</select>
+	
+	<!-- 홍보 게시글 댓글 삭제 -->
+	<delete id="removeReply">
+		DELETE FROM S_RECRUITREPLY WHERE RECRUITNUM=#{recruitnum}
+	</delete>	
+	
+ 	<!-- 홍보 게시글 싫어요 1 증가 -->
+ 	<update id="updateDislikeRecruitnum">
+ 		UPDATE WEB.S_MOIMRECRUIT
+		SET DISLIKE=DISLIKE+1
+		WHERE RECRUITNUM = #{recruitnum}
+ 	</update>
+ 	
+	<!-- 홍보 게시글 싫어요 검색 -->
+ 	<select id="getDislikeRecruitnum" resultType="_int">
+ 		SELECT DISLIKE FROM S_MOIMRECRUIT WHERE RECRUITNUM = #{recruitnum}
+ 	</select>
+ 	
+	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 내 전체 모임(myMoimAll.jsp) ========================================== -->		
+
+ 	<!-- 나의 전체 모임 리스트 -->
+ 	<select id="getMyMoimListAll" resultType="com.project.domain.MoimDTO">
+ 		<![CDATA[
+			SELECT M.MOIMNUM, M.MOIMNAME, M.USERID, TO_CHAR(M.STARTDATE, 'YYYY-MM-DD') STARTDATE, TO_CHAR(M.ENDDATE, 'YYYY-MM-DD') ENDDATE
+			FROM
+				(SELECT ROWNUM RN, MO.* FROM S_MOIM MO JOIN S_MOIMMEMBER MEM 
+					ON MO.MOIMNUM = MEM.MOIMNUM
+					WHERE MEM.USERID = #{userid} AND ROWNUM <= #{cri.pagenum}*#{cri.amount} ORDER BY MO.MOIMNUM DESC
+				) M
+			WHERE M.RN > (#{cri.pagenum}-1)*#{cri.amount}
+ 		]]>
+ 	</select>
+
+	<!-- 전체 모임 수-->
+	<select id="getMyMoimTotal" resultType="_int">
+		SELECT COUNT(*) 
+		FROM 
+			(SELECT ROWNUM RN, MO.* FROM S_MOIM MO JOIN S_MOIMMEMBER MEM 
+				ON MO.MOIMNUM = MEM.MOIMNUM
+				WHERE MEM.USERID = #{userid})
+	</select>
+	
+	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 내가 방장인 모임(myMoim.jsp) ========================================== --> 	
+ 	
+ 	<!-- 나의 방장인 모임 리스트 -->
+ 	<select id="getMyMoimListKing" resultType="com.project.domain.MoimDTO">
+ 		<![CDATA[
+	 		SELECT MOIMNUM, MOIMNAME, MOIMTYPE, MOIMBUDGET, TO_CHAR(STARTDATE, 'YYYY-MM-DD') STARTDATE, TO_CHAR(ENDDATE, 'YYYY-MM-DD') ENDDATE, USERID, PLACENUM, DISLIKE
+	 		FROM 
+	 			(SELECT ROWNUM RN, MO.* FROM S_MOIM MO
+	 			WHERE USERID = #{userid} AND ROWNUM <= #{cri.pagenum}*#{cri.amount} ORDER BY MO.MOIMNUM DESC
+	 			) M
+	 		WHERE M.RN > (#{cri.pagenum}-1)*#{cri.amount}
+ 		]]>
+	</select>
+		
+	<!-- 전체 모임 수-->
+	<select id="getMyMoimKingTotal" resultType="_int">
+		SELECT COUNT(*) 
+		FROM S_MOIM WHERE USERID = #{userid}
+	</select>	
+	
+ 	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 강퇴당한 모임(myMoimBan.jsp) ========================================== --> 		
+
+ 	<!-- 나의 강퇴 메세지 리스트 -->
+ 	<select id="getMyBanList" resultType="com.project.domain.FireMoimDTO">
+ 		<![CDATA[
+	 		SELECT M.BANNUM, M.USERID, M.MOIMNUM, M.MESSAGE, M.MOIMNAME
+	 		FROM 
+	 			(SELECT ROWNUM RN, FI.*, MO.MOIMNAME FROM S_FIREMOIM FI JOIN S_MOIM MO
+	 			ON MO.MOIMNUM = FI.MOIMNUM
+	 			WHERE FI.USERID = #{userid} AND ROWNUM <= #{cri.pagenum}*#{cri.amount} ORDER BY MO.MOIMNUM DESC
+	 			) M
+	 		WHERE M.RN > (#{cri.pagenum}-1)*#{cri.amount}
+ 		]]>
+	</select>
+		
+	<!-- 전체 강퇴 메세지 수-->
+	<select id="getBanTotal" resultType="_int">
+		SELECT COUNT(*) 
+		FROM S_FIREMOIM WHERE USERID = #{userid}
+	</select>		
+
+	<!-- 강퇴 메세지 삭제 -->
+	<delete id="deleteMessage">
+ 		DELETE FROM S_FIREMOIM WHERE BANNUM=#{bannum}
+ 	</delete>	
+	
+</mapper>

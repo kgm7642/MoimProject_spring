@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.ReplyBoardMapper">
+
+	<!-- =============================================== 댓글 등록 =============================================== -->
+	
+	<!-- 댓글 등록 -->
+	<insert id="insertBoardReply">
+		INSERT INTO WEB.S_REPLY
+		(REPLYNUM, BOARDNUM, USERID, CONTENTS, REGDATE)
+		VALUES(SEQ_S_REPLY.NEXTVAL, #{boardnum}, #{userid}, #{contents}, SYSDATE)
+	</insert>
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 댓글 리스트=============================================== -->
+	<!-- 댓글 총 개수 -->
+	<select id="getBoardReplyTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_REPLY WHERE BOARDNUM=#{boardnum}
+	</select>
+	
+	<!-- 댓글 리스트 -->
+	<select id="getBoardReplyList" resultType="com.project.domain.ReplyDTO">
+		<![CDATA[
+			SELECT REPLYNUM, BOARDNUM, USERID, CONTENTS, REGDATE, UPDATEDATE
+			FROM (
+				SELECT /*+ INDEX_ASC(S_RECRUITREPLY S_REPLY_PK) */
+				ROWNUM RN, REPLYNUM, BOARDNUM, USERID, CONTENTS, REGDATE, UPDATEDATE
+				FROM S_REPLY WHERE BOARDNUM=#{boardnum} AND ROWNUM <= #{cri.pagenum}*#{cri.amount}
+			) WHERE RN > (#{cri.pagenum}-1)*#{cri.amount}
+		]]>
+	</select>
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 댓글 삭제=============================================== -->	
+	<delete id="BoardReplyRemove">
+		DELETE FROM S_REPLY WHERE REPLYNUM=#{replynum}	
+	</delete>	
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 댓글 수정 =============================================== -->
+	<update id="BoardReplyUpdate">
+		UPDATE S_REPLY
+		SET CONTENTS=#{contents}, UPDATEDATE=SYSDATE
+		WHERe BOARDNUM=#{boardnum}
+	</update>
+</mapper>

@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.BoardMapper">
+
+	<!-- =============================================== 게시글 리스트(boardList.jsp) =============================================== -->
+	<sql id="criBo">
+		<if test="keyword != null and type != null">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach item="type" collection="typeArr">
+					<trim prefix="or">
+						<choose>
+							<when test="type == 'T'.toString()">
+								(BOARDTITLE LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'C'.toString()">
+								(CONTENTS LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'W'.toString()">
+								(USERID LIKE '%${keyword}%')
+							</when>
+						</choose>					
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>
+
+	<!-- 게시글 리스트 -->
+	<select id="boardList" resultType="com.project.domain.BoardDTO">
+		<![CDATA[
+			SELECT BOARDNUM, USERID, BOARDTITLE, CONTENTS, CATEGORY, REGDATE, VIEWS, LIKES, DISLIKE
+			FROM
+				(SELECT /*+ INDEX_DESC(S_BOARD S_BOARD_PK) */
+				ROWNUM RN, BOARDNUM, USERID, BOARDTITLE, CONTENTS, CATEGORY, REGDATE, VIEWS, LIKES, DISLIKE 
+				FROM S_BOARD WHERE
+		]]>
+		<include refid="criBo"></include>	
+		<![CDATA[
+				ROWNUM<=#{pagenum}*#{amount} ORDER BY BOARDNUM DESC)
+			WHERE RN>(#{pagenum}-1)*#{amount}
+		]]> 
+	</select>
+	
+	<!-- 전체 게시글 수 -->
+	<select id="boardTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_BOARD WHERE
+		<include refid="criBo"></include>
+		BOARDNUM>0
+	</select>	
+
+	<!-- 게시글 작성 -->
+	<insert id="insertBoard">
+		<selectKey keyProperty="boardnum" order="BEFORE" resultType="_int">
+			SELECT SEQ_S_BOARD.NEXTVAL FROM DUAL
+		</selectKey>	
+		INSERT INTO WEB.S_BOARD
+		(BOARDNUM, USERID, BOARDTITLE, CONTENTS, CATEGORY, REGDATE, VIEWS, LIKES, DISLIKE)
+		VALUES(#{boardnum}, #{userid}, #{boardtitle}, #{contents}, #{category}, SYSDATE, 0, 0, 0)
+	</insert>	
+	<!-- ======================================================================================================== -->
+	
+	<!-- ========================================== 게시판 상세보기(boardView.jsp) ========================================== -->	
+		
+	<!-- 게시판 상세보기 -->
+	<select id="getBoardDetail" resultType="com.project.domain.BoardDTO">
+		SELECT * FROM S_BOARD WHERE BOARDNUM = #{boardnum}
+	</select>
+	
+	<!-- 게시글 조회수 1증가 -->
+	<update id="updateViewCnt">
+		UPDATE S_BOARD SET VIEWS = VIEWS+1 WHERE BOARDNUM=#{boardnum}
+	</update>	
+	
+	<!-- 게시글 수정 -->
+	<update id="updateBoard">
+		UPDATE WEB.S_BOARD
+		SET BOARDTITLE=#{boardtitle}, CONTENTS=#{contents}, REGDATE=SYSDATE
+		WHERE BOARDNUM=#{boardnum}
+	</update>		
+ 	
+ 	<!-- 게시글 삭제 -->
+	<delete id="removeBoard">
+		DELETE FROM S_BOARD WHERE BOARDNUM=#{boardnum}
+	</delete>	
+	
+	<!-- 게시글 댓글 조회 -->
+	<select id="searchBoardReply" resultType="_int">
+		SELECT COUNT(*)
+		FROM WEB.S_REPLY WHERE BOARDNUM=#{boardnum}
+	</select>
+	
+	<!-- 게시글 댓글 삭제 -->
+	<delete id="removeBoardReply">
+   		DELETE FROM WEB.S_REPLY	WHERE BOARDNUM=#{boardnum}
+   	</delete> 	
+	
+ 	<!-- 게시글 좋아요 1 증가 -->
+ 	<update id="likeCnt">
+ 		UPDATE WEB.S_BOARD
+		SET LIKES=LIKES+1
+		WHERE BOARDNUM = #{boardnum}
+ 	</update>	
+ 	
+  	<!-- 게시글 싫어요 1 증가 -->
+ 	<update id="dislikeCnt">
+ 		UPDATE WEB.S_BOARD
+		SET DISLIKE=DISLIKE+1
+		WHERE BOARDNUM = #{boardnum}
+ 	</update>
+ 	
+ 	<!-- 게시글 좋아요 검색 -->
+ 	<select id="getLikeCnt" resultType="_int">
+ 		SELECT LIKES FROM S_BOARD WHERE BOARDNUM = #{boardnum}
+ 	</select>	
+ 	
+ 	<!-- 게시글 싫어요 검색 -->
+ 	<select id="getDislikeCnt" resultType="_int">
+ 		SELECT DISLIKE FROM S_BOARD WHERE BOARDNUM = #{boardnum}
+ 	</select>	
+ 	
+ 	<!-- ======================================================================================================== -->
+
+   	
+   		
+</mapper>

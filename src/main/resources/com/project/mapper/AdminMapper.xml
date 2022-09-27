@@ -1,0 +1,368 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.project.mapper.AdminMapper">
+
+	<!-- =============================================== 공지사항 리스트(adminNoticeList.jsp) =============================================== -->
+	<sql id="criNo">
+		<if test="keyword != null and type != null">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach item="type" collection="typeArr">
+					<trim prefix="or">
+						<choose>
+							<when test="type == 'T'.toString()">
+								(NOTICETITLE LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'C'.toString()">
+								(CONTENTS LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'W'.toString()">
+								(USERID LIKE '%${keyword}%')
+							</when>
+						</choose>					
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>
+
+	<!-- 공지사항 리스트 -->
+	<select id="adminNoticeList" resultType="com.project.domain.NoticeDTO">
+		<![CDATA[
+			SELECT NOTICENUM, USERID, NOTICETITLE, CONTENTS, REGDATE, VIEWS
+			FROM
+				(SELECT /*+ INDEX_DESC(S_NOTICE S_NOTICE_PK) */
+				ROWNUM RN, NOTICENUM, USERID, NOTICETITLE, CONTENTS, REGDATE, VIEWS
+				FROM S_NOTICE WHERE
+		]]>
+		<include refid="criNo"></include>	
+		<![CDATA[
+				ROWNUM<=#{pagenum}*#{amount} ORDER BY NOTICENUM DESC)
+			WHERE RN>(#{pagenum}-1)*#{amount}
+		]]> 
+	</select>
+	
+	<!-- 전체 공지사항 수 -->
+	<select id="adminNoticeTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_NOTICE WHERE
+		<include refid="criNo"></include>
+		NOTICENUM>0
+	</select>	
+
+	<!-- =============================================== 공지사항 작성하기(adminNoticeWrite.jsp) =============================================== -->
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- 공지사항 작성 -->
+	<insert id="insertAdminNotice">
+		<selectKey keyProperty="noticenum" order="BEFORE" resultType="_int">
+			SELECT SEQ_S_BOARD.NEXTVAL FROM DUAL
+		</selectKey>	
+		INSERT INTO WEB.S_NOTICE
+		(NOTICENUM, USERID, NOTICETITLE, CONTENTS, REGDATE, VIEWS)
+		VALUES(#{noticenum}, #{userid}, #{noticetitle}, #{contents}, SYSDATE, 0)
+	</insert>		
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- ========================================== 공지사항 상세보기(adminNoticeView.jsp) ========================================== -->	
+		
+	<!-- 공지사항 상세보기 -->
+	<select id="getAdminNoticeDetail" resultType="com.project.domain.NoticeDTO">
+		SELECT * FROM S_NOTICE WHERE NOTICENUM = #{noticenum}
+	</select>
+	<!-- ======================================================================================================== -->
+	
+	<!-- ========================================== 공지사항 수정하기(adminNoticeModify.jsp) ========================================== -->	
+		
+	<!-- 공지사항 수정 -->
+	<update id="updateAdminNotice">
+		UPDATE WEB.S_NOTICE
+		SET NOTICETITLE=#{noticetitle}, CONTENTS=#{contents}, REGDATE=SYSDATE
+		WHERE NOTICENUM=#{noticenum}
+	</update>
+	<!-- ======================================================================================================== -->
+	
+	<!-- ========================================== 공지사항 삭제하기 ========================================== -->	
+			
+	<!-- 공지사항 삭제 -->
+	<delete id="removeAdminNotice">
+		DELETE FROM S_NOTICE WHERE NOTICENUM=#{noticenum}
+	</delete>
+	<!-- ======================================================================================================== -->
+	
+	<!-- ========================================== 모임 리스트(adminMoimList.jsp) ========================================== -->	
+				
+	<sql id="criMoim">
+		<if test="keyword != null and type != null">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach item="type" collection="typeArr">
+					<trim prefix="or">
+						<choose>
+							<when test="type == 'T'.toString()">
+								MOIMNAME LIKE '%${keyword}%'
+							</when>
+							<when test="type == 'W'.toString()">
+								USERID LIKE '%${keyword}%'
+							</when>
+						</choose>
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>	
+	
+	<!-- 전체 모임 수-->
+	<select id="adminMoimTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_MOIM	WHERE
+		<include refid="criMoim"/>
+		MOIMNUM > 0
+	</select>
+	
+	<!-- 모임 리스트 -->
+	<select id="adminMoimList" resultType="com.project.domain.MoimDTO">
+		<![CDATA[
+			SELECT MOIMNUM, MOIMNAME, MOIMTYPE, MOIMBUDGET, STARTDATE, ENDDATE, USERID, PLACENUM, DISLIKE
+			FROM 
+				(SELECT /*+ INDEX_DESC(S_MOIM SYS_C008948) */
+				ROWNUM RN, MOIMNUM, MOIMNAME, MOIMTYPE, MOIMBUDGET, STARTDATE, ENDDATE, USERID, PLACENUM, DISLIKE
+				FROM S_MOIM WHERE 
+		]]>
+		<include refid="criMoim"/>
+		<![CDATA[
+			ROWNUM <= #{pagenum}*#{amount} ORDER BY MOIMNUM DESC)
+			WHERE RN > (#{pagenum}-1)*#{amount}
+		]]>
+	</select>	
+	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 관리자 모임 상세 보기(adminGetMoimInfo.jsp) =============================================== -->	
+	<!-- 모임 멤버 -->
+	<select id="adminGetMemberId" resultType="String">
+		SELECT USERID FROM S_MOIMMEMBER WHERE MOIMNUM=#{moimnum}
+	</select>
+	
+	<!-- 모임 멤버 정보 -->
+	<select id="adminGetMemberInfo" resultType="com.project.domain.UserDTO">
+		SELECT * FROM S_USER WHERE USERID=#{userid}
+	</select>
+	
+ 	<!-- 장소 번호 검색 -->
+	<select id="adminGetPlaceNum" resultType="_int">
+		SELECT PLACENUM FROM S_MOIM WHERE MOIMNUM=#{moimnum}
+	</select>	
+	
+	<!-- 모임 상세 정보 -->
+	<select id="adminGetMoimDetail" resultType="com.project.domain.MoimDTO">
+		SELECT * FROM S_MOIM WHERE MOIMNUM=#{moimnum}
+	</select>
+	
+	<!-- 모임 장소 정보  -->
+	<select id="adminGetPlaceDetail" resultType="com.project.domain.PlaceDTO">
+		SELECT * FROM S_PLACE WHERE PLACENUM=#{placenum}
+	</select>	
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 관리자 모임 삭제하기  =============================================== -->	
+		
+ 	<!-- 모임 채팅 삭제 -->
+ 	<delete id="adminDeleteChat">
+			DELETE FROM S_MOIMCHAT WHERE MOIMNUM=#{moimnum}
+	</delete>	
+ 	
+ 	<!-- 모임 멤버 삭제 -->
+ 	<delete id="adminDeleteMembers">
+		DELETE FROM S_MOIMMEMBER WHERE MOIMNUM=#{moimnum}
+	</delete>	
+ 	
+ 	<!-- 모임 강퇴 메세지 삭제 -->
+ 	<delete id="adminDeleteFireMoim">
+		DELETE FROM S_FIREMOIM WHERE MOIMNUM=#{moimnum}
+	</delete>
+	
+	<!-- 모임 가입 신청 삭제 -->
+	<delete id = "adminDeleteMoimJoin">
+		DELETE FROM S_MOIMJOIN
+		WHERE MOIMNUM = #{moimnum}
+	</delete>	
+
+	<!-- 홍보 게시글 모두 검색 -->
+	<select id="adminGetRecruitnums" resultType="Integer">
+		SELECT RECRUITNUM FROM S_MOIMRECRUIT
+		WHERE MOIMNUM=#{moimnum}
+	</select> 	
+ 	
+ 	<!-- 홍보 게시글 삭제 -->
+	<delete id="adminDeleteRecruit">
+		DELETE FROM S_MOIMRECRUIT
+		WHERE MOIMNUM = #{moimnum}
+	</delete> 	
+	
+	<!-- 홍보 게시글 댓글 삭제 -->
+ 	<delete id="adminDeleteProReply">
+		DELETE FROM S_RECRUITREPLY
+		WHERE RECRUITNUM = #{recruitnum}
+	</delete>		
+ 	
+ 	<!-- 모임 삭제 -->
+	<delete id="adminDeleteMoim">
+		DELETE FROM S_MOIM WHERE MOIMNUM=#{moimnum}
+	</delete>
+
+	<!-- 장소 삭제 -->
+	<delete id="adminDeletePlace">
+ 		DELETE FROM S_PLACE WHERE PLACENUM=#{placenum}
+ 	</delete>	
+ 	
+	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 관리자 모임 홍보 게시판(adminProMoimList.jsp) ========================================== -->	
+	
+	<sql id="criAdminPro">
+		<if test="keyword != null and type != null">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach item="type" collection="typeArr">
+					<trim prefix="or">
+						<choose>
+							<when test="type == 'T'.toString()">
+								(RECRUITTITLE LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'C'.toString()">
+								(RECRUITCONTENTS LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'W'.toString()">
+								(USERID LIKE '%${keyword}%')
+							</when>
+						</choose>					
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>	
+
+	<!-- 모임 홍보 리스트 -->
+	<select id="adminProMoimList" resultType="com.project.domain.MoimRecruitDTO">
+		<![CDATA[
+			SELECT RECRUITNUM, RECRUITTITLE, USERID, RECRUITCONTENTS, READCNT, MOIMNUM, REGDATE, DISLIKE
+			FROM
+				(SELECT /*+ INDEX_DESC(S_MOIMRECRUIT SYS_C008984) */
+				ROWNUM RN, RECRUITNUM, RECRUITTITLE, USERID, RECRUITCONTENTS, READCNT, MOIMNUM, REGDATE, DISLIKE 
+				FROM S_MOIMRECRUIT WHERE
+		]]>
+		<include refid="criAdminPro"></include>	
+		<![CDATA[
+				ROWNUM<=#{pagenum}*#{amount} ORDER BY RECRUITNUM DESC)
+			WHERE RN>(#{pagenum}-1)*#{amount}
+		]]> 
+	</select>
+	
+	<!-- 전체 홍보 게시글 수 -->
+	<select id="adminProMoimTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_MOIMRECRUIT WHERE
+		<include refid="criAdminPro"></include>
+		RECRUITNUM>0
+	</select> 	
+ 	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 관리자 모임 홍보 게시판 상세보기(adminProMoimView.jsp) ========================================== -->	
+
+	<!-- 홍보 게시글 상세보기 -->
+	<select id="adminGetRecruitDetail" resultType="com.project.domain.MoimRecruitDTO">
+		SELECT * FROM S_MOIMRECRUIT WHERE RECRUITNUM = #{recruitnum}
+	</select>
+		
+ 	<!-- ======================================================================================================== -->
+
+	<!-- ========================================== 관리자 모임 홍보 게시판 삭제  ========================================== -->	
+	
+	<!-- 홍보 게시글 삭제 -->
+	<delete id="adminRemoveRecruit">
+		DELETE FROM S_MOIMRECRUIT WHERE RECRUITNUM=#{recruitnum}
+	</delete>
+	
+	<!-- 홍보 게시글 댓글 조회 -->
+	<select id="adminSearchReply" resultType="_int">
+		SELECT COUNT(*)
+		FROM WEB.S_RECRUITREPLY WHERE RECRUITNUM=#{recruitnum}
+	</select>
+	
+	<!-- 홍보 게시글 댓글 삭제 -->
+	<delete id="adminRemoveReply">
+		DELETE FROM S_RECRUITREPLY WHERE RECRUITNUM=#{recruitnum}
+	</delete>	
+	
+ 	<!-- ======================================================================================================== -->
+	
+	<!-- =============================================== 관리자 게시글 리스트(adminBoardList.jsp) =============================================== -->
+	<sql id="criAdminBo">
+		<if test="keyword != null and type != null">
+			<trim prefixOverrides="or" prefix="(" suffix=") and">
+				<foreach item="type" collection="typeArr">
+					<trim prefix="or">
+						<choose>
+							<when test="type == 'T'.toString()">
+								(BOARDTITLE LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'C'.toString()">
+								(CONTENTS LIKE '%${keyword}%')
+							</when>
+							<when test="type == 'W'.toString()">
+								(USERID LIKE '%${keyword}%')
+							</when>
+						</choose>					
+					</trim>
+				</foreach>
+			</trim>
+		</if>
+	</sql>
+
+	<!-- 게시글 리스트 -->
+	<select id="adminBoardList" resultType="com.project.domain.BoardDTO">
+		<![CDATA[
+			SELECT BOARDNUM, USERID, BOARDTITLE, CONTENTS, CATEGORY, REGDATE, VIEWS, LIKES, DISLIKE
+			FROM
+				(SELECT /*+ INDEX_DESC(S_BOARD S_BOARD_PK) */
+				ROWNUM RN, BOARDNUM, USERID, BOARDTITLE, CONTENTS, CATEGORY, REGDATE, VIEWS, LIKES, DISLIKE 
+				FROM S_BOARD WHERE
+		]]>
+		<include refid="criAdminBo"></include>	
+		<![CDATA[
+				ROWNUM<=#{pagenum}*#{amount} ORDER BY BOARDNUM DESC)
+			WHERE RN>(#{pagenum}-1)*#{amount}
+		]]> 
+	</select>
+	
+	<!-- 전체 게시글 수 -->
+	<select id="adminBoardTotal" resultType="_int">
+		SELECT COUNT(*) FROM S_BOARD WHERE
+		<include refid="criAdminBo"></include>
+		BOARDNUM>0
+	</select>	
+	
+	<!-- ======================================================================================================== -->
+	
+	<!-- ========================================== 게시판 상세보기(adminBoardView.jsp) ========================================== -->	
+		
+	<!-- 관리자 게시판 상세보기 -->
+	<select id="adminGetBoardDetail" resultType="com.project.domain.BoardDTO">
+		SELECT * FROM S_BOARD WHERE BOARDNUM = #{boardnum}
+	</select>		
+	
+ 	<!-- 관리자 게시글 삭제 -->
+	<delete id="adminRemoveBoard">
+		DELETE FROM S_BOARD WHERE BOARDNUM=#{boardnum}
+	</delete>	
+	
+	<!-- 관리자 게시글 댓글 조회 -->
+	<select id="adminSearchBoardReply" resultType="_int">
+		SELECT COUNT(*)
+		FROM WEB.S_REPLY WHERE BOARDNUM=#{boardnum}
+	</select>
+	
+	<!-- 관리자 게시글 댓글 삭제 -->
+	<delete id="adminRemoveBoardReply">
+   		DELETE FROM WEB.S_REPLY	WHERE BOARDNUM=#{boardnum}
+   	</delete> 		
+</mapper>
