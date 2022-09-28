@@ -1,30 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE HTML>
 <html>
 <head>
 <title>홍보 게시판 관리 [admin]</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
+<link rel="stylesheet" href="/resources/assets/css/admin/adminProMoimList.css" />
 </head>
-<style>
-.recruit {
-	cursor: pointer;
-}
-
-td {
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-table {
-	table-layout: fixed;
-}
-</style>
 <body class="is-preload">
 	<c:if test="${session.userid == null}">
 		<script>
@@ -62,8 +46,7 @@ table {
 				</ul>
 			</div>
 			<a href="#wrapper" class="more">Learn More</a>
-			<video src="/resources/assets/css/images/banner.mp4" muted autoplay
-				loop playsinline></video>
+			<video src="/resources/assets/css/images/banner.mp4" muted autoplay	loop playsinline></video>
 		</section>
 
 
@@ -195,28 +178,5 @@ table {
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
-<script>
-	let searchForm = $("#searchForm");
-	let pageForm = $("#pageForm");
-	$(".pageChange").on("click", function(e) {
-		e.preventDefault();
-
-		pageForm.find("input[name='pagenum']").val($(this).attr("href"))
-		pageForm.submit();
-	})
-
-	$('#searchForm a').on("click", function(e) {
-		e.preventDefault();
-		if (!searchForm.find("option:selected").val()) {
-			alert("검색 기준을 선택하세요.");
-			return false;
-		}
-		if (!searchForm.find("input[name='keyword']").val()) {
-			alert("키워드를 입력하세요.")
-			return false;
-		}
-		searchForm.find("input[name='pagenum']").val("1");
-		searchForm.submit();
-	})
-</script>
+<script src="/resources/assets/js/admin/adminProMoimList.js"></script>
 </html>

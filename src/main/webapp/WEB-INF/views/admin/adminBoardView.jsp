@@ -1,15 +1,12 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <title>게시글 상세보기 [admin]</title>
 <meta charset="UTF-8">
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
-<title>Together</title>
 </head>
 <body>
 	<c:if test="${session.userid == null}">
@@ -40,12 +37,10 @@
 						<tr>
 							<th align="center" style="text-align: center; width: 20%;">
 								작성자</th>
-							<td><input type="hidden" name="boardtitle" size="65"
-								readonly value="${board.boardtitle}"> ${board.userid}</td>
+							<td><input type="hidden" name="boardtitle" size="65" readonly value="${board.boardtitle}"> ${board.userid}</td>
 						</tr>
 						<tr>
-							<th align="center" align="center"
-								style="text-align: center; width: 20%;">카테고리</th>
+							<th align="center" align="center" style="text-align: center; width: 20%;">카테고리</th>
 							<td><c:choose>
 									<c:when test="${board.category == 1}">여행</c:when>
 									<c:when test="${board.category == 2}">스터디</c:when>
@@ -60,10 +55,8 @@
 								</c:choose></td>
 						</tr>
 						<tr>
-							<th align="center" align="center"
-								style="text-align: center; width: 20%;">내 용</th>
-							<td><textarea name="contents"
-									style="height: 700px; resize: none;" readonly>${board.contents}</textarea>
+							<th align="center" align="center" style="text-align: center; width: 20%;">내 용</th>
+							<td><textarea name="contents" style="height: 700px; resize: none;" readonly>${board.contents}</textarea>
 							</td>
 						</tr>
 					</table>
@@ -74,8 +67,7 @@
 							class="button small"
 							href="/admin/adminBoardRemove?boardnum=${board.boardnum}"
 							style="float: right; margin-left: 20px;">삭제</a>
-						<div
-							style="float: right; display: inline-block; margin-right: 10px;">
+						<div style="float: right; display: inline-block; margin-right: 10px;">
 							🚨신고 횟수🚨 : ${board.dislike} 회</div>
 					</div>
 				</div>

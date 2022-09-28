@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn"%>
 <!DOCTYPE HTML>
@@ -7,41 +6,12 @@
 <head>
 <title>홍보 게시글 상세보기 [admin]</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
-<link rel="stylesheet"
-	href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css"
+<link rel="stylesheet" href="/resources/assets/css/admiin/adminProMoimView.css" />
+<link rel="stylesheet" href="http://code.jquery.com/ui/1.8.18/themes/base/jquery-ui.css"
 	type="text/css" />
 </head>
-<style>
-#pre1 {
-	padding: 0px;
-	background-color: #E6E6FA;
-	overflow: auto;
-	white-space: pre-wrap;
-	word-break: break-all;
-}
-
-#pre2 {
-	padding: 10px;
-	overflow: auto;
-	white-space: pre-wrap;
-	word-break: break-all;
-}
-
-td {
-	padding: 0px;
-	border-spacing: 0 0px;
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-table {
-	table-layout: fixed;
-}
-</style>
 <body class="is-preload">
 	<c:set var="page" value="${requestScope.page}" />
 	<c:if test="${session.userid == null}">
@@ -173,18 +143,12 @@ table {
 
 	</div>
 </body>
-<script
-	src="https://tistory1.daumcdn.net/tistory/2784544/skin/images/xmltojsonPast.min.js"></script>
-<script type="text/javascript"
-	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=608550f7326ed470642f95701b5d006a&libraries=services"></script>
-<script type="text/javascript"
-	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=APIKEY&libraries=LIBRARY"></script>
-<script type="text/javascript"
-	src="//dapi.kakao.com/v2/maps/sdk.js?appkey=APIKEY&libraries=services,clusterer,drawing"></script>
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script
-	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script	src="https://tistory1.daumcdn.net/tistory/2784544/skin/images/xmltojsonPast.min.js"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=608550f7326ed470642f95701b5d006a&libraries=services"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=APIKEY&libraries=LIBRARY"></script>
+<script src="//dapi.kakao.com/v2/maps/sdk.js?appkey=APIKEY&libraries=services,clusterer,drawing"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script	src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="/resources/assets/js/createplace.js"></script>
 <script src="/resources/assets/js/jquery.min.js"></script>
 <script src="/resources/assets/js/jquery.scrolly.min.js"></script>
@@ -196,35 +160,6 @@ table {
 <script>
 	let placelat = "${place.placelat}"
 	let placelng = "${place.placelng}"
-	// 이미지 지도에서 마커가 표시될 위치입니다 
-	var markerPosition = new kakao.maps.LatLng(placelat, placelng);
-
-	// 이미지 지도에 표시할 마커입니다
-	// 이미지 지도에 표시할 마커는 Object 형태입니다
-	var marker = {
-		position : markerPosition
-	};
-
-	var staticMapContainer = document.getElementById('staticMap'), // 이미지 지도를 표시할 div  
-	staticMapOption = {
-		center : new kakao.maps.LatLng(placelat, placelng), // 이미지 지도의 중심좌표
-		level : 3, // 이미지 지도의 확대 레벨
-		marker : marker
-	// 이미지 지도에 표시할 마커 
-	};
-
-	// 이미지 지도를 생성합니다
-	var staticMap = new kakao.maps.StaticMap(staticMapContainer,
-			staticMapOption);
-
-	//게시글 목록
-	function adminProMoimlist() {
-		location.href = "/admin/adminProMoimList${cri.listLink}";
-	}
-
-	//홍보 게시글 삭제
-	function removeboard() {
-		location.href = "/admin/adminRemovePro?recruitnum=${moimrecruit.recruitnum}";
-	}
 </script>
+<script src="/resources/assets/js/admin/adminProMoimView.js"></script>
 </html>

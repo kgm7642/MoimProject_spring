@@ -483,12 +483,7 @@ table, tr, th, td {
 									success : function(result, status, xhr) {
 										console.log(result);
 										if (result == "success") {
-											location.href = "/moim/adMoimJoin?joinType=search&moimnum="
-													+ $
-											{
-												moim.moimnum
-											}
-											;
+											location.href = "/moim/adMoimJoin?joinType=search&moimnum="+ ${moim.moimnum};
 										} else {
 											alert("이미 가입되어 있는 모임입니다.");
 										}
