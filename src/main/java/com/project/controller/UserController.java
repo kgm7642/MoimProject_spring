@@ -25,7 +25,7 @@ import lombok.extern.log4j.Log4j;
 @Log4j
 @RequestMapping("/user/")
 public class UserController {
-	
+//	커밋확인
 	@Setter(onMethod_ = @Autowired)
 	private UserService service;
 	
