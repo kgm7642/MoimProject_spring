@@ -1,0 +1,13 @@
+@charset "UTF-8";
+
+body {
+	background-color: white !important;
+}
+
+#select:hover {
+	color: #15CBE3
+}
+
+.label:hover {
+	color: #15CBE3
+}

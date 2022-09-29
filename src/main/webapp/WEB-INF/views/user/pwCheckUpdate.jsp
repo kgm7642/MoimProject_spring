@@ -2,29 +2,15 @@
 <%@page import="java.sql.PreparedStatement"%>
 <%@page import="java.sql.DriverManager"%>
 <%@page import="java.sql.Connection"%>
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <title>개인 정보 수정 - 비밀번호 확인</title>
 <meta charset="UTF-8">
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
-<style>
-table {
-	border-collapse: initial;
-	width: 70%;
-	text-align: center;
-	margin: 0 auto;
-}
-
-.align-center {
-	text-align: center;
-}
-</style>
 </head>
 <body class="is-preload">
 	<c:if test="${session.userid == null}">
@@ -72,7 +58,6 @@ table {
 				</table>
 			</form>
 
-
 			<!-- CTA -->
 
 			<!-- Footer -->
@@ -87,24 +72,7 @@ table {
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
-<script
-	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
-<script src="/resources/assets/js/user.js"></script>
-<script>
-	function sendPW(){
-		let joinForm = document.joinForm;
-		let pwTag = joinForm.userpw;
-		if(pwTag.value == ""){
-			alert("비밀번호를 입력해주세요.");
-			pwTag.focus();
-			return false;
-		}
-		if(pwTag.value != "${session.userpw}"){
-			alert("비밀번호를 확인해주세요.")
-			pwTag.focus();
-			return false;
-		}
-		return true;
-	}
-</script>
+<script	src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script src="/resources/assets/js/user/user.js"></script>
+<script src="/resources/assets/js/user/pwCheckUpdate.js"></script>
 </html>

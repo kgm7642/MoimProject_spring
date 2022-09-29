@@ -1,13 +1,11 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE HTML>
 <html>
 <head>
 <title>모임 가입 신청서 작성</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
 </head>
 <body class="is-preload">
@@ -85,17 +83,5 @@
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
-<script>
-		//유효성 검사
-		function sendit(){
-			let joincontents = document.getElementById("joincontents");
-			let dupTag = document.getElementById("result");
-			if(joincontents.value == ""){
-				alert("내용을 입력하세요!");
-				joincontents.focus();
-				return false;
-			}
-			return true;
-		}
-	</script>
+<script src="/resources/assets/js/moim/adMoimJoin.js"></script>
 </html>

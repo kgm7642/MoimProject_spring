@@ -1,0 +1,8 @@
+@charset "UTF-8";
+
+.replyCss {
+	padding: 0px;
+	overflow: auto;
+	white-space: pre-wrap;
+	word-break: break-all;
+}

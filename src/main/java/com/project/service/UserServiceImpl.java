@@ -86,6 +86,7 @@ public class UserServiceImpl implements UserService{
 	
 	// 회원가입 발송 이메일(인증키 발송)
 	public void mailSendWithUserKey(String e_mail, String userid, HttpServletRequest request) {
+		log.info("메일 인증 들어왔음");
 		String userkey = getKey(false, 20);
 		mapper.setKey(userid, userkey); 
 		MimeMessage mail = mailSender.createMimeMessage();

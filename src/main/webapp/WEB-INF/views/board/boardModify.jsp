@@ -1,35 +1,14 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE HTML>
 <html>
 <head>
 <title>게시글 수정</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
+<link rel="stylesheet" href="/resources/assets/css/board/boardModify.css" />
 </head>
-<style>
-#wrapper {
-	margin-left: auto;
-	margin-right: auto;
-}
-
-table, tr, th, td {
-	margin-left: auto;
-	margin-right: auto;
-}
-
-.finput {
-	position: absolute;
-	left: -9999px;
-	width: 1px;
-	height: 1px;
-	padding: 0;
-	margin: -1px;
-}
-</style>
 <body class="is-preload">
 	<c:if test="${session.userid == null}">
 		<script>
@@ -117,25 +96,7 @@ table, tr, th, td {
 <script src="/resources/assets/js/browser.min.js"></script>
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
-<script src="/resources/assets/js/main.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-	//유효성 검사
-	function sendit() {
-		let boardForm = document.boardForm;
-		let boardtitle = boardForm.boardtitle;
-		let contents = boardForm.contents;
-		let dupTag = document.getElementById("result");
-		if (boardtitle.value == "") {
-			alert("제목을 입력하세요!");
-			boardtitle.focus();
-			return false;
-		}
-		if (contents.value == "") {
-			alert("내용을 입력하세요!");
-			contents.focus();
-			return false;
-		}
-	}
-</script>
+<script src="/resources/assets/js/main.js"></script>
+<script src="/resources/assets/js/board/boardModify.js"></script>
 </html>

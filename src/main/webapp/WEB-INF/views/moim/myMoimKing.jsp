@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <!DOCTYPE HTML>
@@ -7,53 +6,8 @@
 <head>
 <title>나의 모임(방장인 모임)</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
-<style>
-table {
-	border-collapse: initial;
-	width: 100%;
-	border: 1px solid #8e8e8e;
-	table-layout: fixed;
-	text-align: center;
-}
-
-table.pagination {
-	border: 0px solid;
-	background-color: #ffffff;
-}
-
-.todaymoim {
-	background-color: #7fa4e5;
-	color: black;
-	cursor: pointer;
-}
-
-.ingmoim {
-	background-color: #c6e0eb;
-	color: black;
-	cursor: pointer;
-}
-
-.willmoim {
-	background-color: #fdf8b4;
-	color: black;
-	cursor: pointer;
-}
-
-.endmoim {
-	background-color: #c4c9d3;
-	color: black;
-	cursor: pointer;
-}
-
-td {
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-</style>
 </head>
 <body class="is-preload">
 	<c:if test="${session.userid == null}">
@@ -241,13 +195,5 @@ td {
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
-<script>
-		let pageForm = $("#pageForm");
-		$(".pageChange").on("click", function(e){
-			e.preventDefault();
-			
-			pageForm.find("input[name='pagenum']").val($(this).attr("href"))
-			pageForm.submit();
-		})
-  	</script>
+<script src="/resources/assets/js/moim/myMoimKing.js"></script>
 </html>

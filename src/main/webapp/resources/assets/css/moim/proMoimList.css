@@ -1,0 +1,15 @@
+@charset "UTF-8";
+
+.proMoimList {
+	cursor: pointer;
+}
+
+td {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+table {
+	table-layout: fixed;
+}

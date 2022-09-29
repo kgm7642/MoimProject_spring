@@ -1,26 +1,13 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE HTML>
 <html>
 <head>
 <title>비밀번호 확인</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
-<style>
-table, form {
-	border-collapse: initial;
-	width: 70%;
-	text-align: center;
-	margin: 0 auto;
-}
-
-.align-center {
-	text-align: center;
-}
-</style>
+<link rel="stylesheet" href="/resources/assets/css/user/showPw.css" />
 </head>
 <body class="is-preload">
 
@@ -79,5 +66,4 @@ table, form {
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
-
 </html>

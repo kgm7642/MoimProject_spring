@@ -1,0 +1,44 @@
+@charset "UTF-8";
+
+table {
+	border-collapse: initial;
+	width: 100%;
+	border: 1px solid #8e8e8e;
+	table-layout: fixed;
+	text-align: center;
+}
+
+table.pagination {
+	border: 0px solid;
+	background-color: #ffffff;
+}
+
+.todaymoim {
+	background-color: #7fa4e5;
+	color: black;
+	cursor: pointer;
+}
+
+.ingmoim {
+	background-color: #c6e0eb;
+	color: black;
+	cursor: pointer;
+}
+
+.willmoim {
+	background-color: #fdf8b4;
+	color: black;
+	cursor: pointer;
+}
+
+.endmoim {
+	background-color: #c4c9d3;
+	color: black;
+	cursor: pointer;
+}
+
+td {
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}

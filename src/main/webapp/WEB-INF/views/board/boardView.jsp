@@ -1,24 +1,15 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <title>게시글 상세보기</title>
 <meta charset="UTF-8">
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
+<link rel="stylesheet" href="/resources/assets/css/board/boardView.css" />
 <title>Together</title>
 </head>
-<style>
-.replyCss {
-	padding: 0px;
-	overflow: auto;
-	white-space: pre-wrap;
-	word-break: break-all;
-}
-</style>
 <body>
 	<c:if test="${session.userid == null}">
 		<script>
@@ -189,289 +180,292 @@
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
 <script>
-	//댓글
+//댓글
 
-	$(document).ready(function() {
-		getList(1);
+$(document).ready(function() {
+	getList(1);
+});
+
+let check = false;
+let replies = $(".replies");
+let page = $(".page");
+let pagenum = 1;
+
+function getList(pagenum) {
+	let boardnum = "${board.boardnum}";
+
+	$.ajax({
+		url : "/replyB/pages/" + boardnum + "/" + pagenum,
+		type : "GET",
+		dataType : "json",
+		contentType : "application/json; charset=utf-8",
+		success : showList
 	});
+}
 
-	let check = false;
-	let replies = $(".replies");
-	let page = $(".page");
-	let pagenum = 1;
+function showList(data) {
+	//댓글 총 개수
+	let replyCnt = data.replyCnt;
+	//댓글 리스트
+	let list = data.list;
+	let str = "";
 
-	function getList(pagenum) {
-		let boardnum = "${board.boardnum}";
-
-		$.ajax({
-			url : "/replyB/pages/" + boardnum + "/" + pagenum,
-			type : "GET",
-			dataType : "json",
-			contentType : "application/json; charset=utf-8",
-			success : showList
-		});
-	}
-
-	function showList(data) {
-		//댓글 총 개수
-		let replyCnt = data.replyCnt;
-		//댓글 리스트
-		let list = data.list;
-		let str = "";
-
-		for (let i = 0, len = list.length; i < len; i++) {
-			str += "<table style='padding:0px;margin:0px;'>";
-			str += '<tr>';
-			str += '<td style="width:14%;vertical-align:middle;">';
-			str += '<strong class="userid'+list[i].replynum+'">'
-					+ list[i].userid + '</strong>';
+	for (let i = 0, len = list.length; i < len; i++) {
+		str += "<table style='padding:0px;margin:0px;'>";
+		str += '<tr>';
+		str += '<td style="width:14%;vertical-align:middle;">';
+		str += '<strong class="userid'+list[i].replynum+'">'
+				+ list[i].userid + '</strong>';
+		str += '</td>';
+		str += '<td style="width:60%;vertical-align:middle;">';
+		str += '<p class="replyCss reply' + list[i].replynum
+				+ '"" style="width:100%;margin:0px;hegiht:auto;">'
+				+ list[i].contents + '</p>';
+		str += '</td>';
+		str += '<td style="width:25%;vertical-align:middle;">';
+		str += '<span>' + replyTime(list[i]) + '</span>';
+		if (list[i].userid == "${session.userid}") {
+			str += '<table style="padding:0px;">'
+			str += '<tr style="border:0px;">';
+			str += '<td style="vertical-align:middle;">';
+			str += '<a href="'+list[i].replynum+'" class="modify">수정</a>';
+			str += '<a href="'+list[i].replynum+'" class="mfinish" style="display:none;">수정완료</a>&nbsp;&nbsp;';
+			str += '<a href="'+list[i].replynum+'" class="remove">삭제</a></div>';
 			str += '</td>';
-			str += '<td style="width:60%;vertical-align:middle;">';
-			str += '<p class="replyCss reply' + list[i].replynum
-					+ '"" style="width:100%;margin:0px;hegiht:auto;">'
-					+ list[i].contents + '</p>';
-			str += '</td>';
-			str += '<td style="width:25%;vertical-align:middle;">';
-			str += '<span>' + replyTime(list[i]) + '</span>';
-			if (list[i].userid == "${session.userid}") {
-				str += '<table style="padding:0px;">'
-				str += '<tr style="border:0px;">';
-				str += '<td style="vertical-align:middle;">';
-				str += '<a href="'+list[i].replynum+'" class="modify">수정</a>';
-				str += '<a href="'+list[i].replynum+'" class="mfinish" style="display:none;">수정완료</a>&nbsp;&nbsp;';
-				str += '<a href="'+list[i].replynum+'" class="remove">삭제</a></div>';
-				str += '</td>';
-				str += '</tr>';
-				str += '</table>';
-			}
-			str += '</td>';
-			str += '<tr>';
+			str += '</tr>';
 			str += '</table>';
 		}
-
-		//댓글 시간
-		function replyTime(reply) {
-			let regdate = reply.regdate;
-			let updatedate = reply.updatedate;
-			let now = new Date();
-			let dateObj = new Date(check ? regdate : updatedate);
-
-			//true면 수정 안한거
-			let checkUpdate = regdate == updatedate;
-			let gap = now.getTime() - dateObj.getTime();
-
-			let str = "";
-			if (gap < 1000 * 60 * 60 * 24) {
-				let hh = dateObj.getHours();
-				let mi = dateObj.getMinutes();
-				let ss = dateObj.getSeconds();
-
-				str = (hh > 9 ? '' : '0') + hh + ":" + (mi > 9 ? '' : '0') + mi
-						+ ":" + (ss > 9 ? '' : '0') + ss;
-			} else {
-				let yy = dateObj.getFullYear();
-				let mm = dateObj.getMonth() + 1;
-				let dd = dateObj.getDate();
-
-				str = yy + '/' + (mm > 9 ? '' : '0') + mm + '/'
-						+ (dd > 9 ? '' : '0') + dd;
-			}
-			return (checkUpdate ? '' : '(수정됨)') + str;
-		}
-
-		//댓글 페이징 처리
-		showReplyPage(replyCnt);
-
-		replies.html(str);
-
-		//댓글 삭제
-		$(".remove").on("click", function(e) {
-			e.preventDefault();
-			let replynum = $(this).attr("href");
-			$.ajax({
-				type : "DELETE",
-				url : "/replyB/" + replynum,
-				success : function(result, status, xhr) {
-					alert(replynum + "번 댓글 삭제 완료!");
-				},
-				error : function(xhr, status, e) {
-					alert("댓글 삭제 실패");
-				}
-			})
-			check = false;
-			getList(pagenum)
-		})
-
-		$(".modify")
-				.on(
-						"click",
-						function(e) {
-							e.preventDefault();
-
-							if (!check) {
-								let replynum = $(this).attr("href");
-								let replytag = $(".reply" + replynum);
-
-								replytag
-										.html('<textarea class="'+replynum+' mdf" style="resize:none;">'
-												+ replytag.text()
-												+ '</textarea>')
-
-								$(this).hide();
-								$(this).next().show();
-
-								check = true;
-							} else {
-								alert("이미 수정중인 댓글이 있습니다!");
-							}
-						})
-
-		$(".mfinish").on("click", function(e) {
-			e.preventDefault();
-
-			let replynum = $(this).attr("href");
-			let boardnum = "${board.boardnum}";
-			let userid = $(".userid" + replynum).text();
-			let contents = $("." + replynum).val();
-			let data = {
-				replynum : replynum,
-				boardnum : boardnum,
-				userid : userid,
-				contents : contents
-			};
-
-			$.ajax({
-				type : "PUT",
-				url : "/replyB/" + data.replynum,
-				data : JSON.stringify(data),
-				contentType : "application/json; charset=utf-8",
-				success : function(result, status, xhr) {
-					alert("댓글 수정 완료");
-				},
-				error : function(xhr, status, e) {
-					alert("댓글 수정 실패");
-				}
-			})
-			check = false;
-			getList(pagenum);
-		})
-
-		function showReplyPage(replyCnt) {
-			let endPage = Math.ceil(pagenum / 5.0) * 5;
-			let startPage = endPage - 4;
-
-			let prev = startPage != 1;
-			let next = false;
-
-			if (endPage * 5 >= replyCnt) {
-				endPage = Math.ceil(replyCnt / 5);
-			}
-			if (endPage * 5 < replyCnt) {
-				next = true;
-			}
-
-			let str = "";
-			if (prev) {
-				str += "<a class='changePage' href='" + (startPage - 1)
-						+ "'><code>&lt;</code></a>";
-			}
-			for (let i = startPage; i <= endPage; i++) {
-				if (i == pagenum) {
-					str += "<code>" + i + "</code>";
-				} else {
-					str += "<a class='changePage' href='"+i+"'><code>" + i
-							+ "</code></a>"
-				}
-			}
-			if (next) {
-				str += "<a class='changePage' href='" + (endPage + 1)
-						+ "'><code>&gt;</code></a>";
-			}
-			page.html(str);
-
-			$(".changePage").on("click", function(e) {
-				e.preventDefault();
-				let goPage = $(this).attr("href");
-				pagenum = parseInt(goPage);
-				getList(pagenum);
-			})
-		}
+		str += '</td>';
+		str += '<tr>';
+		str += '</table>';
 	}
 
-	//댓글 등록
-	$(".regist").on("click", function(e) {
+	//댓글 시간
+	function replyTime(reply) {
+		let regdate = reply.regdate;
+		let updatedate = reply.updatedate;
+		let now = new Date();
+		let dateObj = new Date(check ? regdate : updatedate);
 
+		//true면 수정 안한거
+		let checkUpdate = regdate == updatedate;
+		let gap = now.getTime() - dateObj.getTime();
+
+		let str = "";
+		if (gap < 1000 * 60 * 60 * 24) {
+			let hh = dateObj.getHours();
+			let mi = dateObj.getMinutes();
+			let ss = dateObj.getSeconds();
+
+			str = (hh > 9 ? '' : '0') + hh + ":" + (mi > 9 ? '' : '0') + mi
+					+ ":" + (ss > 9 ? '' : '0') + ss;
+		} else {
+			let yy = dateObj.getFullYear();
+			let mm = dateObj.getMonth() + 1;
+			let dd = dateObj.getDate();
+
+			str = yy + '/' + (mm > 9 ? '' : '0') + mm + '/'
+					+ (dd > 9 ? '' : '0') + dd;
+		}
+		return (checkUpdate ? '' : '(수정됨)') + str;
+	}
+
+	//댓글 페이징 처리
+	showReplyPage(replyCnt);
+
+	replies.html(str);
+
+	//댓글 삭제
+	$(".remove").on("click", function(e) {
+		e.preventDefault();
+		let replynum = $(this).attr("href");
+		$.ajax({
+			type : "DELETE",
+			url : "/replyB/" + replynum,
+			success : function(result, status, xhr) {
+				alert(replynum + "번 댓글 삭제 완료!");
+			},
+			error : function(xhr, status, e) {
+				alert("댓글 삭제 실패");
+			}
+		})
+		check = false;
+		getList(pagenum)
+	})
+
+	$(".modify")
+			.on(
+					"click",
+					function(e) {
+						e.preventDefault();
+
+						if (!check) {
+							let replynum = $(this).attr("href");
+							let replytag = $(".reply" + replynum);
+
+							replytag
+									.html('<textarea class="'+replynum+' mdf" style="resize:none;">'
+											+ replytag.text()
+											+ '</textarea>')
+
+							$(this).hide();
+							$(this).next().show();
+
+							check = true;
+						} else {
+							alert("이미 수정중인 댓글이 있습니다!");
+						}
+					})
+
+	$(".mfinish").on("click", function(e) {
+		e.preventDefault();
+
+		let replynum = $(this).attr("href");
 		let boardnum = "${board.boardnum}";
-		let userid = "${session.userid}";
-		let contents = $("textarea[name='contents']").val();
+		let userid = $(".userid" + replynum).text();
+		let contents = $("." + replynum).val();
 		let data = {
+			replynum : replynum,
 			boardnum : boardnum,
 			userid : userid,
 			contents : contents
 		};
 
-		if (contents == "") {
-			alert("내용을 작성 후 등록해주세요.");
-			return;
-		}
-
 		$.ajax({
-			type : "post",
-			url : "/replyB/regist",
+			type : "PUT",
+			url : "/replyB/" + data.replynum,
 			data : JSON.stringify(data),
 			contentType : "application/json; charset=utf-8",
 			success : function(result, status, xhr) {
-				alert("댓글 등록 완료");
+				alert("댓글 수정 완료");
 			},
 			error : function(xhr, status, e) {
-				alert("댓글 등록 실패");
+				alert("댓글 수정 실패");
 			}
 		})
-		$("textarea[name='contents']").val("");
+		check = false;
 		getList(pagenum);
 	})
 
-	//좋아요
-	$("#likeCnt").on("click", function(e) {
-		e.preventDefault();
+	function showReplyPage(replyCnt) {
+		let endPage = Math.ceil(pagenum / 5.0) * 5;
+		let startPage = endPage - 4;
 
-		let boardnum = "${board.boardnum}"
-		let json = {
-			"boardnum" : boardnum,
-		};
-		$.ajax({
-			type : "POST",
-			url : "/board/likeCnt",
-			data : JSON.stringify(json),
-			contentType : "application/json",
-			success : function(result, status, xhr) {
-				$("#likeCnt").html("💖" + result);
-			},
-			error : function(xhr, status, e) {
+		let prev = startPage != 1;
+		let next = false;
+
+		if (endPage * 5 >= replyCnt) {
+			endPage = Math.ceil(replyCnt / 5);
+		}
+		if (endPage * 5 < replyCnt) {
+			next = true;
+		}
+
+		let str = "";
+		if (prev) {
+			str += "<a class='changePage' href='" + (startPage - 1)
+					+ "'><code>&lt;</code></a>";
+		}
+		for (let i = startPage; i <= endPage; i++) {
+			if (i == pagenum) {
+				str += "<code>" + i + "</code>";
+			} else {
+				str += "<a class='changePage' href='"+i+"'><code>" + i
+						+ "</code></a>"
 			}
-		})
-	})
+		}
+		if (next) {
+			str += "<a class='changePage' href='" + (endPage + 1)
+					+ "'><code>&gt;</code></a>";
+		}
+		page.html(str);
 
-	//싫어요
-	$("#dislikeCnt").on("click", function(e) {
-		e.preventDefault();
-
-		let boardnum = "${board.boardnum}"
-		let json = {
-			"boardnum" : boardnum,
-		};
-		$.ajax({
-			type : "POST",
-			url : "/board/dislikeCnt",
-			data : JSON.stringify(json),
-			contentType : "application/json",
-			success : function(result, status, xhr) {
-				$("#dislikeCnt").html("💔" + result);
-			},
-			error : function(xhr, status, e) {
-			}
+		$(".changePage").on("click", function(e) {
+			e.preventDefault();
+			let goPage = $(this).attr("href");
+			pagenum = parseInt(goPage);
+			getList(pagenum);
 		})
+	}
+}
+
+//댓글 등록
+$(".regist").on("click", function(e) {
+	console.log("${board.boardnum}");
+	
+	let boardnum = "${board.boardnum}";
+	let userid = "${session.userid}";
+	let contents = $("textarea[name='contents']").val();
+	let data = {
+		boardnum : boardnum,
+		userid : userid,
+		contents : contents
+	};
+
+	if (contents == "") {
+		alert("내용을 작성 후 등록해주세요.");
+		return;
+	}
+	
+	console.log("댓글 등록 데이터 출력"+data.boardnum);
+	
+	$.ajax({
+		type : "post",
+		url : "/replyB/regist",
+		data : JSON.stringify(data),
+		contentType : "application/json; charset=utf-8",
+		success : function(result, status, xhr) {
+			alert("댓글 등록 완료");
+		},
+		error : function(xhr, status, e) {
+			alert("댓글 등록 실패");
+		}
 	})
+	$("textarea[name='contents']").val("");
+	getList(pagenum);
+})
+
+//좋아요
+$("#likeCnt").on("click", function(e) {
+	e.preventDefault();
+
+	let boardnum = "${board.boardnum}"
+	let json = {
+		"boardnum" : boardnum,
+	};
+	$.ajax({
+		type : "POST",
+		url : "/board/likeCnt",
+		data : JSON.stringify(json),
+		contentType : "application/json",
+		success : function(result, status, xhr) {
+			$("#likeCnt").html("💖" + result);
+		},
+		error : function(xhr, status, e) {
+		}
+	})
+})
+
+//싫어요
+$("#dislikeCnt").on("click", function(e) {
+	e.preventDefault();
+
+	let boardnum = "${board.boardnum}"
+	let json = {
+		"boardnum" : boardnum,
+	};
+	$.ajax({
+		type : "POST",
+		url : "/board/dislikeCnt",
+		data : JSON.stringify(json),
+		contentType : "application/json",
+		success : function(result, status, xhr) {
+			$("#dislikeCnt").html("💔" + result);
+		},
+		error : function(xhr, status, e) {
+		}
+	})
+})
 </script>
 </html>
 

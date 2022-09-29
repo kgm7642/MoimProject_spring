@@ -66,6 +66,7 @@ public class UserController {
 	@PostMapping("join")
 	public String join(UserDTO userdto, Model model, HttpServletRequest req) {
 		service.insert(userdto);
+		log.info("조인 컨트롤러 접근");
 		service.mailSendWithUserKey(userdto.getUseremail(), userdto.getUserid(), req);
 		log.info("회원가입 성공");
 		return "redirect:/user/waitEmailCheck";

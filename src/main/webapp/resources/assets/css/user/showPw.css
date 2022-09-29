@@ -1,0 +1,12 @@
+@charset "UTF-8";
+
+table, form {
+	border-collapse: initial;
+	width: 70%;
+	text-align: center;
+	margin: 0 auto;
+}
+
+.align-center {
+	text-align: center;
+}

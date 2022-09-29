@@ -1,34 +1,16 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
 <head>
 <title>강퇴 멤버 관리</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
+<link rel="stylesheet" href="/resources/assets/css/moim/manageMember.css" />
 </head>
-<style>
-table, tr, th, td {
-	text-align: center;
-	align: center;
-	valign: middle;
-}
-
-td {
-	overflow: hidden;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-}
-
-table {
-	table-layout: fixed;
-}
-</style>
 <body class="is-preload">
 	<c:if test="${session.userid == null}">
 		<script>
@@ -65,9 +47,9 @@ table {
 								<c:forEach items="${members}" var="member">
 									<tr style="text-align: center;">
 										<td width="30%">${member.usernickname}(${member.userid})</td>
-										<td width="30%"><c:if test="${member.userphoneopen == 1}">												
-														${member.userphone}
-													</c:if> <c:if test="${member.userphoneopen == 0}">
+										<td width="30%"><c:if test="${member.useremailopen == 1}">												
+														${member.useremail}
+													</c:if> <c:if test="${member.useremailopen == 0}">
 														비 공 개
 													</c:if></td>
 										<c:choose>

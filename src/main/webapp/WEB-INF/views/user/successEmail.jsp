@@ -1,5 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE html>
 <html>
@@ -8,8 +7,7 @@
 <title>이메일 인증 완료</title>
 </head>
 <body>
-	<a><img src="/images/ms-logo.png"
-		style="height: 80px; margin-left: 10px;" /></a>
+	<a><img src="/images/ms-logo.png" style="height: 80px; margin-left: 10px;" /></a>
 	<br>
 	<br>
 	<h3>안녕하세요, ${param.userid} 님</h3>

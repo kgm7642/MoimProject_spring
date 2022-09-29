@@ -1,13 +1,11 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <!DOCTYPE HTML>
 <html>
 <head>
 <title>비밀번호 찾기</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
 </head>
 <body class="is-preload">
@@ -75,7 +73,6 @@
 
 	</div>
 
-
 </body>
 <!-- Scripts -->
 <script src="/resources/assets/js/jquery.min.js"></script>
@@ -85,29 +82,5 @@
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
-<script>
-	function sendit() {
-		if (userid != null) {
-			let idTag = document.findpwForm.userid;
-			if (idTag.value == "") {
-				alert("아이디를 입력하세요!");
-				idTag.focus();
-				return false;
-			}
-			let emailTag = document.findpwForm.useremail;
-			if (emailTag.value == "") {
-				alert("이메일을 입력해주세요.");
-				emailTag.focus();
-				return false;
-			}
-			var email = /^([0-9a-zA-Z_\.-]+)@([0-9a-zA-Z_-]+)(\.[0-9a-zA-Z_-]+){1,2}$/;
-			if (!email.test(emailTag.value)) {
-				alert("이메일 형식이 잘못되었습니다.");
-				emailTag.focus();
-				return false;
-			}
-		}
-		return true;
-	}
-</script>
+<script src="/resources/assets/js/user/findPw.js"></script>
 </html>

@@ -1,14 +1,11 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8"
-	pageEncoding="UTF-8"%>
+<%@ page language="java" contentType="text/html; charset=UTF-8"	pageEncoding="UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-
 <!DOCTYPE HTML>
 <html>
 <head>
 <title>로그인</title>
 <meta charset="utf-8" />
-<meta name="viewport"
-	content="width=device-width, initial-scale=1, user-scalable=no" />
+<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
 <link rel="stylesheet" href="/resources/assets/css/main.css" />
 </head>
 <body class="is-preload">
@@ -96,23 +93,5 @@
 <script src="/resources/assets/js/breakpoints.min.js"></script>
 <script src="/resources/assets/js/util.js"></script>
 <script src="/resources/assets/js/main.js"></script>
-<script>
-	let idTag = document.loginForm.userid;
-	let pwTag = document.loginForm.userpw;
-	function sendit() {
-		if (idTag.value != null) {
-			if (idTag.value == "") {
-				alert("아이디를 입력하세요!");
-				idTag.focus();
-				return false;
-			}
-			if (pwTag.value == "") {
-				alert("비밀번호를 입력하세요!");
-				pwTag.focus();
-				return false;
-			}
-		}
-		return true;
-	}
-</script>
+<script src="/resources/assets/js/user/login.js"></script>
 </html>
