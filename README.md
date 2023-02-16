@@ -1,6 +1,3 @@
-# MoimProject_spring
-JSP 모임 프로젝트를 Spring 프로젝트로 이관
-
 ![image](https://user-images.githubusercontent.com/85470797/219276658-b84f0851-5438-4eca-b124-191235ccb9d8.png)
 ![image](https://user-images.githubusercontent.com/85470797/219276711-495ce139-cfd5-428a-b38d-89a8dd59b794.png)
 ![image](https://user-images.githubusercontent.com/85470797/219276863-0c4e59b9-51ea-4134-ad92-f85b90f84110.png)
